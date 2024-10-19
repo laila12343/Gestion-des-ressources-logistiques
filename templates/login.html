@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+</head>
+<body>
+    <h2>Login</h2>
+    <form action="/" method="post">
+        <input type="text" name="email" placeholder="Email" required><br>
+        <input type="password" name="mot_de_passe" placeholder="Mot de passe" required><br>
+        <label for="type">Je suis :</label>
+        <select name="type">
+            <option value="admin">Administrateur</option>
+            <option value="livreur">Livreur</option>
+            <option value="client">Client</option>
+        </select><br>
+        <input type="submit" value="Login">
+    </form>
+    <p>{{ msg }}</p>
+    <a href="/register">Créer un compte</a>
+</body>
+</html>
