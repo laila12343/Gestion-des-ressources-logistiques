@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head><title>Checkout</title></head>
+<body>
+    <h1>Order Summary</h1>
+    <ul>
+        {% for product_id, item in cart.items() %}
+            <li>{{ products[product_id-1].name }} - Quantity: {{ item.quantity }}</li>
+        {% endfor %}
+    </ul>
+    <p>Total: {{ total }}</p>
+    <p>Thank you for shopping with us!</p>
+</body>
+</html>

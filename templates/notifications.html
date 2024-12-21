@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<head><title>Notifications</title></head>
+<body>
+    <h1>Your Notifications</h1>
+    <ul>
+        {% for note in notifications %}
+            <li>{{ note.message }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
