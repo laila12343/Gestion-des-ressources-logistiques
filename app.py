@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session
 from flask_wtf.csrf import CSRFProtect
+
+
 app = Flask(__name__)
 app.secret_key = 'sakhta-secret-key'
 csrf = CSRFProtect(app)
@@ -8,12 +10,35 @@ users = {"user1": {"name": "John", "email": "john@example.com", "password": "123
 
 products = [
     {"id": 1, "name": "Product A", "price": 100},
-    {"id": 2, "name": "Product B", "price": 200}
+    {"id": 2, "name": "Product B", "price": 200},
+    {"id": 3, "name": "Product C", "price": 300},
 ]
 orders = {"user1": [{"id": 1, "status": "Delivered"}, {"id": 2, "status": "In preparation"}]}
 feedbacks = []
-
-
+cart = {
+    "1": {  # Product ID as the key (string)
+        "id": 1,          # Product ID
+        "name": "Laptop", # Product name
+        "price": 1000.0,  # Price per unit
+        "quantity": 2, # Quantity of the product
+        "image": "laptop.jpg"
+    },
+    "2": {  # Another product in the cart
+        "id": 2,
+        "name": "Mouse",
+        "price": 50.0,
+        "quantity": 1,
+        "image": "mouse.jpg"
+    },
+    "3": {
+        "id": 3,
+        "name": "Camera",
+        "price": 750.0,
+        "quantity": 1,
+        "image": "camera.jpg"
+    },
+}
+#print(sum(item['price'] * item['quantity'] for item in cart.values()))
 # ---------------- User Authentication ----------------
 @app.route('/account')
 def account():
@@ -31,26 +56,7 @@ def account():
 
 @app.route('/')
 def index():
-    cart = {
-    "1": {  # Product ID as the key (string)
-        "id": 1,          # Product ID
-        "name": "Laptop", # Product name
-        "price": 1000.0,  # Price per unit
-        "quantity": 2,    # Quantity of the product
-    },
-    "2": {  # Another product in the cart
-        "id": 2,
-        "name": "Mouse",
-        "price": 50.0,
-        "quantity": 1,
-    },
-    "3": {
-        "id": 3,
-        "name": "Keyboard",
-        "price": 75.0,
-        "quantity": 1,
-    },
-}
+    
     num_of_items = len(cart)
     return render_template('index.html', user_authenticated=True, user_name="John", cart=cart, products=products)
 
@@ -88,10 +94,10 @@ def profile():
 
 # ---------------- Shopping Cart ----------------
 @app.route('/cart')
-def cart():
+def shop_cart():
     
     #cart = session.get('cart', {})
-    total = sum(products[item['id']-1]['price'] * item['quantity'] for item in cart.values())
+    total = sum(item['price'] * item['quantity'] for item in cart.values())
     return render_template('cart.html', cart=cart, products=products, total=total)
 
 
@@ -118,13 +124,31 @@ def delete_from_cart(product_id):
 
 
 # ---------------- Shopping Summary Page ----------------
+from flask_wtf import FlaskForm
+from wtforms import StringField, SubmitField
+from wtforms.validators import DataRequired
+
+class ShippingForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired()])
+    surname = StringField('Surname', validators=[DataRequired()])
+    phone = StringField('Phone', validators=[DataRequired()])
+    address = StringField('Address', validators=[DataRequired()])
+    city = StringField('City', validators=[DataRequired()])
+    submit = SubmitField('Submit')
+
 @app.route('/checkout')
 def checkout():
     token = session.get("_csrf_token")
-    cart = session.get('cart', {})
+    #cart = session.get('cart', {})
     #cart={"num_of_items": 5}
-    total = sum(products[item['id']-1]['price'] * item['quantity'] for item in cart.values())
-    return render_template('checkout.html', cart=cart, products=products, total=total,csrf_token=token)
+    # = request.user.customer
+    #cartitems = list(cart.values())
+    #form = ShippingForm()
+    total = sum(item['price'] * item['quantity'] for item in cart.values())
+    context = {'cart': cart #,'form':form
+               #'cartitems':cartitems, #'customer_address': customer_address
+               }
+    return render_template('checkout.html', cart=cart, products=products, total=total,csrf_token=token,context=context)
 
 
 # ---------------- Order Tracking ----------------
@@ -168,32 +192,7 @@ def notifications():
     ]
     return render_template('notifications.html', notifications=user_notifications)
 
-@app.route('change_info', methods=['POST'])
-def update_user_info(request):
-    customer = request.user.customer
-    form = UpdateUserForm(instance=customer)
-    if request.method == 'POST':
-        form = UpdateUserForm(request.POST, instance=customer)
-        if form.is_valid():
-            form.save()
-            return redirect ('account')
-    context = {'form': form}
-    return render(request, 'update_user.html', context)
 
-@app.route('change_adress', methods=['POST'])
-def changeAddress(request):
-    customer = request.user.customer
-    address = Address.objects.get(customer=customer)
-    form = AddressForm(instance=address)
-    if request.method == 'POST':
-        form = AddressForm(request.POST,instance=address)
-        if form.is_valid():
-            new_address = form.save(commit=False)
-            new_address.customer = customer
-            new_address.save()
-            return redirect('checkout')
-    context = {'form':form}
-    return render(request, 'updateaddress.html', context)
 # ---------------- Run the App ----------------
 if __name__ == '__main__':
     app.run(debug=True)

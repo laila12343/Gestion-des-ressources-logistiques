@@ -30,7 +30,7 @@
           <tr>
             <th scope="row"><h3 id = 'list_of_items'><strong>Items: {{cart.num_of_items}}</strong></h3></th>
             <td></td>
-            <td><h3 id = 'cartTotal'><strong>Total: ${{ cart.cart_total|default(0)|round(2) }}</strong></h3></td>
+            <td><h3 id = 'cartTotal'><strong>Total: ${{ total|default(0)|round(2) }}</strong></h3></td>
             <!-- <td></td> -->
             
             <td>
@@ -91,8 +91,6 @@
         qtyField[i].addEventListener('change', updateQuantity)
     }
     function updateQuantity(e){
-
-      
       document.getElementById('spinner').style.display='block'
 
         let grandParent = e.target.parentElement.parentElement

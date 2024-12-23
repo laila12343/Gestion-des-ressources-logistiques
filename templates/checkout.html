@@ -31,34 +31,35 @@
                
                 {% endfor %}
                 {% else %}
+                <form class="row g-3" id='shipping-form' method='POST'>
                   <form class="row g-3" id ='shipping-form' method = 'POST'>
-
-                  <div id = 'shippingInfo'>
-                      <h3>Shipping Information</h3>
-                      <br>
-                     
                     
-                      <div class = 'row'>
+                    <div id = 'shippingInfo'>
+                        <h3>Shipping Information</h3>
+                        <br>
                        
-                        {% for field in form %}
-                        
-                          <div class="col-md-6">
-                              <label for="inputEmail4" class="form-label"> {{field.label}} </label>
-                              <!-- <input type="text" class="form-control" id="inputEmail4" name = 'address' required> -->
-                              {{field}}
-                              <br>
-                            </div>
-                            {% endfor %}
-                            
+                      
+                        <div class = 'row'>
+                         
+                          {% for field in form %}
+                          
+                            <div class="col-md-6">
+                                <label for="inputEmail4" class="form-label"> {{field.label}} </label>
+                                <!-- <input type="text" class="form-control" id="inputEmail4" name = 'address' required> -->
+                                {{field}}
+                                <br>
+                              </div>
+                              {% endfor %}
+                              
+                         
+                        </div>
                        
-                      </div>
-                     
-                  </div>
-
+                    </div>
+              
                 
                   <div class="col-12">
                       <div class="d-grid gap-2">
-                          <button class="btn btn-primary" type="submit" id = 'cbtn'>Continue</button>
+                          <button class="btn btn-primary" type="submit" id = 'cbtn' >Continue</button>
                           <!-- <button class="btn btn-primary hidden" type="button" id = 'pbtn'>Paypal</button> -->
                         </div>
                   </div>
@@ -97,7 +98,7 @@
                       <tr>
                         
                         <h2>Order Summary</h2>
-                        <h3><strong>Total: ${{cart.cart_total|default(0)|round(2)}}</strong><h3></h3>
+                        <h3><strong>Total: ${{total|default(0)|round(2)}}</strong><h3></h3>
                       </tr>
                     </thead>
                     <tbody>
@@ -110,15 +111,15 @@
                         <th scope="col"><h5></h5></th>
                         <th scope="col"><h5>Total</h5></th>
                       </tr>
-                      {% for item in cartitems %}
+                      {% for item in cart.values() %}
                       <tr>
                         
-                        <td scope="row"><div id = "cart_image"><img src = '{{item.product.image.url}}'></div></td>
-                        <td><h5>{{item.product.name}}</h5></td>
-                        <td><h5>x{{item.quantity}}</h5></td>
-                        <td><h5>${{item.product.price}}</h5></td>
+                        <td scope="row"><div id = "cart_image"><img src = '{{ url_for('static', filename='img/' + item['image']) }}'></div></td>
+                        <td><h5>{{item['name']}}</h5></td>
+                        <td><h5>${{item['quantity']}}</h5></td>
+                        <td><h5>${{item['price']}}</h5></td>
                         <td><h5></h5></td>
-                        <td><h5>${{item.subTotal|round(2)}}</h5></td>
+                        <td><h5>${{item['price']*item['quantity']|round(2)}}</h5></td>
                       </tr>
                      {% endfor %}
                      
