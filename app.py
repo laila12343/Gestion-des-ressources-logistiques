@@ -14,10 +14,28 @@ feedbacks = []
 
 
 # ---------------- User Authentication ----------------
+@app.route('/account')
+def account():
+    customer = {
+        'first_name': 'John',
+        'last_name': 'Doe',
+        'email': 'johndoe@example.com'
+    }
+    addresses = [
+        {'home_address': '123 Main St', 'bus_stop': 'Central', 'city': 'Springfield', 'state': 'IL'}
+    ]
+    myaddress = True
+    return render_template('myaccount.html', customer=customer, addresses=addresses, myaddress=myaddress)
+
+
+@app.route('/')
+def index():
+    return render_template('index.html', user_authenticated=True, user_name="John", cart={"num_of_items": 5})
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        user = request.form['username']
+        user = request.form['email']
         for username, details in users.items():
             if user == details['email'] and details['password'] == request.form['password']:
                 session['user'] = username
@@ -25,10 +43,6 @@ def login():
         return "Login Failed"
     return render_template('login.html')
 
-@app.route('/test', methods=['GET', 'POST'])
-def login():
-    
-    return render_template('test.html')
 
 
 @app.route('/logout')
