@@ -1,10 +1,11 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session
-
+from flask_wtf.csrf import CSRFProtect
 app = Flask(__name__)
 app.secret_key = 'sakhta-secret-key'
-
+csrf = CSRFProtect(app)
 # Mock Databases
 users = {"user1": {"name": "John", "email": "john@example.com", "password": "1234"}}
+
 products = [
     {"id": 1, "name": "Product A", "price": 100},
     {"id": 2, "name": "Product B", "price": 200}
@@ -30,7 +31,28 @@ def account():
 
 @app.route('/')
 def index():
-    return render_template('index.html', user_authenticated=True, user_name="John", cart={"num_of_items": 5})
+    cart = {
+    "1": {  # Product ID as the key (string)
+        "id": 1,          # Product ID
+        "name": "Laptop", # Product name
+        "price": 1000.0,  # Price per unit
+        "quantity": 2,    # Quantity of the product
+    },
+    "2": {  # Another product in the cart
+        "id": 2,
+        "name": "Mouse",
+        "price": 50.0,
+        "quantity": 1,
+    },
+    "3": {
+        "id": 3,
+        "name": "Keyboard",
+        "price": 75.0,
+        "quantity": 1,
+    },
+}
+    num_of_items = len(cart)
+    return render_template('index.html', user_authenticated=True, user_name="John", cart=cart, products=products)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -67,7 +89,8 @@ def profile():
 # ---------------- Shopping Cart ----------------
 @app.route('/cart')
 def cart():
-    cart = session.get('cart', {})
+    
+    #cart = session.get('cart', {})
     total = sum(products[item['id']-1]['price'] * item['quantity'] for item in cart.values())
     return render_template('cart.html', cart=cart, products=products, total=total)
 
@@ -75,6 +98,7 @@ def cart():
 @app.route('/add_to_cart/<int:product_id>', methods=['POST'])
 def add_to_cart(product_id):
     session.setdefault('cart', {})
+    #cart={"num_of_items": 5}
     cart = session['cart']
     if product_id in cart:
         cart[product_id]['quantity'] += 1
@@ -87,6 +111,7 @@ def add_to_cart(product_id):
 @app.route('/delete_from_cart/<int:product_id>')
 def delete_from_cart(product_id):
     cart = session.get('cart', {})
+    #cart={"num_of_items": 5}
     cart.pop(product_id, None)
     session['cart'] = cart
     return redirect(url_for('cart'))
@@ -95,9 +120,11 @@ def delete_from_cart(product_id):
 # ---------------- Shopping Summary Page ----------------
 @app.route('/checkout')
 def checkout():
+    token = session.get("_csrf_token")
     cart = session.get('cart', {})
+    #cart={"num_of_items": 5}
     total = sum(products[item['id']-1]['price'] * item['quantity'] for item in cart.values())
-    return render_template('checkout.html', cart=cart, products=products, total=total)
+    return render_template('checkout.html', cart=cart, products=products, total=total,csrf_token=token)
 
 
 # ---------------- Order Tracking ----------------
@@ -141,7 +168,32 @@ def notifications():
     ]
     return render_template('notifications.html', notifications=user_notifications)
 
+@app.route('change_info', methods=['POST'])
+def update_user_info(request):
+    customer = request.user.customer
+    form = UpdateUserForm(instance=customer)
+    if request.method == 'POST':
+        form = UpdateUserForm(request.POST, instance=customer)
+        if form.is_valid():
+            form.save()
+            return redirect ('account')
+    context = {'form': form}
+    return render(request, 'update_user.html', context)
 
+@app.route('change_adress', methods=['POST'])
+def changeAddress(request):
+    customer = request.user.customer
+    address = Address.objects.get(customer=customer)
+    form = AddressForm(instance=address)
+    if request.method == 'POST':
+        form = AddressForm(request.POST,instance=address)
+        if form.is_valid():
+            new_address = form.save(commit=False)
+            new_address.customer = customer
+            new_address.save()
+            return redirect('checkout')
+    context = {'form':form}
+    return render(request, 'updateaddress.html', context)
 # ---------------- Run the App ----------------
 if __name__ == '__main__':
     app.run(debug=True)
