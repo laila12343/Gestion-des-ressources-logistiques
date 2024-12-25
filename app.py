@@ -1,7 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session
 from flask_wtf.csrf import CSRFProtect
-
-
+import os
+import json
+import random
 app = Flask(__name__)
 app.secret_key = 'sakhta-secret-key'
 csrf = CSRFProtect(app)
@@ -16,28 +17,54 @@ products = [
 orders = {"user1": [{"id": 1, "status": "Delivered"}, {"id": 2, "status": "In preparation"}]}
 feedbacks = []
 cart = {
-    "1": {  # Product ID as the key (string)
-        "id": 1,          # Product ID
+    "8467": {  # Product ID as the key (string)
+       # "id": 1,          # Product ID
         "name": "Laptop", # Product name
         "price": 1000.0,  # Price per unit
         "quantity": 2, # Quantity of the product
         "image": "laptop.jpg"
     },
-    "2": {  # Another product in the cart
-        "id": 2,
+    "9493": {  # Another product in the cart
+        #"id": 2,
         "name": "Mouse",
         "price": 50.0,
         "quantity": 1,
         "image": "mouse.jpg"
     },
-    "3": {
-        "id": 3,
+    "2921": {
+       # "id": 3,
         "name": "Camera",
         "price": 750.0,
         "quantity": 1,
         "image": "camera.jpg"
     },
 }
+shop_items = {}
+img_folder = os.path.join(app.static_folder, "img")
+for i, filename in enumerate(os.listdir(img_folder), start=1):
+        if filename.endswith((".png", ".jpg", ".jpeg")):
+            # Generate random data for each item
+            item_id = random.randint(1000, 9999)  # Random 4-digit ID
+            prod_name = f"Product {i}"  # Example product name
+            prod_detail = f"Details about Product {i}"  # Example product details
+            prod_price = round(random.uniform(10, 100), 2)  # Random price between $10 and $100
+            prod_stock = random.randint(0, 50)  # Random stock quantity
+            prod_available = (prod_stock>0)  # Random boolean
+            img_url = f"img/{filename}"  # Image path relative to the static folder
+
+            # Add the item to the dictionary
+            shop_items[item_id] = {
+                #"id": item_id,
+                "name": prod_name,
+                "detail": prod_detail,
+                "price": prod_price,
+                "stock": prod_stock,
+                "is_available": prod_available,
+                "img": img_url,
+            }
+
+            
+#shop_items = {item for filename in os.listdir(img_folder) if filename.endswith((".png", ".jpg", ".jpeg"))]
 #print(sum(item['price'] * item['quantity'] for item in cart.values()))
 # ---------------- User Authentication ----------------
 @app.route('/account')
@@ -59,6 +86,12 @@ def index():
     
     num_of_items = len(cart)
     return render_template('index.html', user_authenticated=True, user_name="John", cart=cart, products=products)
+
+@app.route('/shop')
+def show_gallery():
+    #img_folder = os.path.join(app.static_folder, "img")
+    images = [shop_items[item]['img'] for item in shop_items]
+    return render_template('gallery.html', products=products,images=images, shop_items=shop_items)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -100,16 +133,24 @@ def shop_cart():
     total = sum(item['price'] * item['quantity'] for item in cart.values())
     return render_template('cart.html', cart=cart, products=products, total=total)
 
+def update_cart_item(product_id, quantity):
+    #cart = session.get('cart', {})
+    if product_id in [element['id'] for element in cart.values()]:
+        cart[product_id]['quantity'] = quantity
+        session['cart'] = cart
+    pass    
+
+
 
 @app.route('/add_to_cart/<int:product_id>', methods=['POST'])
 def add_to_cart(product_id):
-    session.setdefault('cart', {})
+    #session.setdefault('cart', {})
     #cart={"num_of_items": 5}
-    cart = session['cart']
+    #cart = session['cart']
     if product_id in cart:
         cart[product_id]['quantity'] += 1
     else:
-        cart[product_id] = {'id': product_id, 'quantity': 1}
+        cart[product_id] = {'name':shop_items['name'],'price':shop_items['price'] ,'quantity': 1,'image': shop_items['img']}
     session['cart'] = cart
     return redirect(url_for('cart'))
 
