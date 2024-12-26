@@ -111,10 +111,10 @@
                         <th scope="col"><h5></h5></th>
                         <th scope="col"><h5>Total</h5></th>
                       </tr>
-                      {% for item in cart.values() %}
+                      {% for id,item in cart.items() %}
                       <tr>
                         
-                        <td scope="row"><div id = "cart_image"><img src = '{{ url_for('static', filename='img/' + item['image']) }}'></div></td>
+                        <td scope="row"><div id = "cart_image"><img src = '{{ url_for('static', filename=item['img']) }}' alt="{{ key }}""></div></td>
                         <td><h5>{{item['name']}}</h5></td>
                         <td><h5>${{item['quantity']}}</h5></td>
                         <td><h5>${{item['price']}}</h5></td>

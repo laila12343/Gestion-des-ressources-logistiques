@@ -16,10 +16,49 @@ products = [
 ]
 orders = {"user1": [{"id": 1, "status": "Delivered"}, {"id": 2, "status": "In preparation"}]}
 feedbacks = []
+data_file = "shop_items.json"
+if os.path.exists(data_file):
+    # Load the dictionary from the file
+    with open(data_file, "r") as file:
+        shop_items = json.load(file)
+else:        
+    shop_items = {}
+    img_folder = os.path.join(app.static_folder, "img")
+    for i, filename in enumerate(os.listdir(img_folder), start=1):
+            if filename.endswith((".png", ".jpg", ".jpeg")):
+                # Generate random data for each item
+                item_id = random.randint(1000, 9999)  # Random 4-digit ID
+                prod_name = f"Product {i}"  # Example product name
+                prod_detail = f"Details about Product {i}"  # Example product details
+                prod_price = round(random.uniform(10, 100), 2)  # Random price between $10 and $100
+                prod_stock = random.randint(0, 50)  # Random stock quantity
+                prod_available = (prod_stock>0)  # Random boolean
+                img_url = f"img/{filename}"  # Image path relative to the static folder
+
+                # Add the item to the dictionary
+                shop_items[item_id] = {
+                    #"id": item_id,
+                    "name": prod_name,
+                    "detail": prod_detail,
+                    "price": prod_price,
+                    "stock": prod_stock,
+                    "is_available": prod_available,
+                    "img": img_url,
+                }
+    with open(data_file, "w") as file:
+        json.dump(shop_items, file)            
+desired_names = ["Product 6", "Product 9", "Product 10"]
 cart = {
+    key: {**value, "quantity": random.randint(1, 4)}
+    for key, value in shop_items.items()
+    if value["name"] in desired_names
+}
+
+
+old_cart = {
     "8467": {  # Product ID as the key (string)
        # "id": 1,          # Product ID
-        "name": "Laptop", # Product name
+        "name": "Product 9", # Product name
         "price": 1000.0,  # Price per unit
         "quantity": 2, # Quantity of the product
         "image": "laptop.jpg"
@@ -38,35 +77,16 @@ cart = {
         "quantity": 1,
         "image": "camera.jpg"
     },
-}
-shop_items = {}
-img_folder = os.path.join(app.static_folder, "img")
-for i, filename in enumerate(os.listdir(img_folder), start=1):
-        if filename.endswith((".png", ".jpg", ".jpeg")):
-            # Generate random data for each item
-            item_id = random.randint(1000, 9999)  # Random 4-digit ID
-            prod_name = f"Product {i}"  # Example product name
-            prod_detail = f"Details about Product {i}"  # Example product details
-            prod_price = round(random.uniform(10, 100), 2)  # Random price between $10 and $100
-            prod_stock = random.randint(0, 50)  # Random stock quantity
-            prod_available = (prod_stock>0)  # Random boolean
-            img_url = f"img/{filename}"  # Image path relative to the static folder
-
-            # Add the item to the dictionary
-            shop_items[item_id] = {
-                #"id": item_id,
-                "name": prod_name,
-                "detail": prod_detail,
-                "price": prod_price,
-                "stock": prod_stock,
-                "is_available": prod_available,
-                "img": img_url,
-            }
-
-            
+}            
 #shop_items = {item for filename in os.listdir(img_folder) if filename.endswith((".png", ".jpg", ".jpeg"))]
 #print(sum(item['price'] * item['quantity'] for item in cart.values()))
 # ---------------- User Authentication ----------------
+
+@app.context_processor
+def inject_csrf_token():
+    from flask_wtf.csrf import generate_csrf
+    return dict(csrf_token=generate_csrf())
+
 @app.route('/account')
 def account():
     customer = {
@@ -147,12 +167,21 @@ def add_to_cart(product_id):
     #session.setdefault('cart', {})
     #cart={"num_of_items": 5}
     #cart = session['cart']
-    if product_id in cart:
-        cart[product_id]['quantity'] += 1
+    product_id = str(product_id)
+    if product_id in shop_items:
+        if product_id in cart:
+            cart[product_id]['quantity'] += 1
+        else:
+            prod_by_id=shop_items[product_id]
+            cart[product_id] = {'name':prod_by_id['name'],'price':prod_by_id['price'] ,'quantity': 1,'image': prod_by_id['img']}
+        session['cart'] = cart
+        session.modified = True
     else:
-        cart[product_id] = {'name':shop_items['name'],'price':shop_items['price'] ,'quantity': 1,'image': shop_items['img']}
-    session['cart'] = cart
-    return redirect(url_for('cart'))
+        return "Product not found"
+    # Redirect back to the page the user was on
+    return render_template('gallery.html', shop_items=shop_items)
+    #return redirect(url_for('cart'))
+    
 
 
 @app.route('/delete_from_cart/<int:product_id>')
