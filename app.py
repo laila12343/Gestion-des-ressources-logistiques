@@ -17,6 +17,7 @@ products = [
 ]
 orders = {"user1": [{"id": 1, "status": "Delivered"}, {"id": 2, "status": "In preparation"}]}
 feedbacks = []
+
 #data=pd.read_csv('DataBase.xlsx')
 import os
 import random
@@ -63,39 +64,21 @@ else:
 
 # Generate a cart dictionary based on desired product names
 desired_names = ["GUESS Gradient Butterfly", "boAt Airdopes 141", "Oppo Enco M32"]
+
 cart = {
     key: {**value, "quantity": random.randint(1, 4)}
     for key, value in shop_items.items()
     if value["name"] in desired_names
 }
 
-# Print the cart for verification
-#print(cart)
 
+=======
+}
 
-old_cart = {
-    "8467": {  # Product ID as the key (string)
-       # "id": 1,          # Product ID
-        "name": "Product 9", # Product name
-        "price": 1000.0,  # Price per unit
-        "quantity": 2, # Quantity of the product
-        "image": "laptop.jpg"
-    },
-    "9493": {  # Another product in the cart
-        #"id": 2,
-        "name": "Mouse",
-        "price": 50.0,
-        "quantity": 1,
-        "image": "mouse.jpg"
-    },
-    "2921": {
-       # "id": 3,
-        "name": "Camera",
-        "price": 750.0,
-        "quantity": 1,
-        "image": "camera.jpg"
-    },
-}            
+@app.context_processor
+def inject_csrf_token():
+    from flask_wtf.csrf import generate_csrf
+    return dict(csrf_token=generate_csrf())
 #shop_items = {item for filename in os.listdir(img_folder) if filename.endswith((".png", ".jpg", ".jpeg"))]
 #print(sum(item['price'] * item['quantity'] for item in cart.values()))
 # ---------------- User Authentication ----------------
@@ -199,7 +182,7 @@ def add_to_cart(product_id):
     # Redirect back to the page the user was on
     return render_template('gallery.html', shop_items=shop_items)
     #return redirect(url_for('cart'))
-    
+
 
 
 @app.route('/delete_from_cart/<int:product_id>')

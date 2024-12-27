@@ -34,27 +34,50 @@
                 <form class="row g-3" id='shipping-form' method='POST'>
                   <form class="row g-3" id ='shipping-form' method = 'POST'>
                     
-                    <div id = 'shippingInfo'>
-                        <h3>Shipping Information</h3>
-                        <br>
-                       
-                      
-                        <div class = 'row'>
-                         
-                          {% for field in form %}
-                          
-                            <div class="col-md-6">
-                                <label for="inputEmail4" class="form-label"> {{field.label}} </label>
-                                <!-- <input type="text" class="form-control" id="inputEmail4" name = 'address' required> -->
-                                {{field}}
-                                <br>
-                              </div>
-                              {% endfor %}
-                              
-                         
-                        </div>
-                       
-                    </div>
+                    <div id='shippingInfo'>
+                      <h3>Shipping Information</h3>
+                      <br>
+                      <div class='row'>
+                          <!-- Nom -->
+                          <div class="col-md-6">
+                              <label for="last_name" class="form-label">Nom</label>
+                              <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Entrez votre nom" required>
+                          </div>
+                  
+                          <!-- Prénom -->
+                          <div class="col-md-6">
+                              <label for="first_name" class="form-label">Prénom</label>
+                              <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Entrez votre prénom" required>
+                          </div>
+                  
+                          <!-- Adresse e-mail -->
+                          <div class="col-md-6">
+                              <label for="email" class="form-label">Adresse e-mail</label>
+                              <input type="email" class="form-control" id="email" name="email" placeholder="Entrez votre e-mail" required>
+                          </div>
+                  
+                          <!-- Numéro de téléphone -->
+                          <div class="col-md-6">
+                              <label for="phone" class="form-label">Numéro de téléphone</label>
+                              <input type="tel" class="form-control" id="phone" name="phone" placeholder="Entrez votre numéro de téléphone" required>
+                          </div>
+                  
+                          <!-- Mode de livraison -->
+                          <div class="col-md-6">
+                              <label for="delivery_mode" class="form-label">Mode de livraison</label>
+                              <select class="form-control" id="delivery_mode" name="delivery_mode" required>
+                                  <option value="domicile">À domicile</option>
+                              </select>
+                          </div>
+                  
+                          <!-- Adresse de livraison -->
+                          <div class="col-md-12">
+                              <label for="delivery_address" class="form-label">Adresse de livraison</label>
+                              <textarea class="form-control" id="delivery_address" name="delivery_address" rows="3" placeholder="Entrez votre adresse de livraison complète" required></textarea>
+                          </div>
+                      </div>
+                  </div>
+                  
               
                 
                   <div class="col-12">
@@ -114,9 +137,12 @@
                       {% for id,item in cart.items() %}
                       <tr>
                         
-                        <td scope="row"><div id = "cart_image"><img src = '{{ url_for('static', filename=item['img']) }}' alt="{{ key }}""></div></td>
+
+                        <td scope="row"><div id = "cart_image"><img src = '{{ url_for('static', filename=item['img']) }}' alt="{{ key }}"></div></td>
+                        <td scope="row"><div id = "cart_image"><img src = '{{ url_for('static', filename=item['img']) }}' alt="{{key}}"></div></td>
+
                         <td><h5>{{item['name']}}</h5></td>
-                        <td><h5>${{item['quantity']}}</h5></td>
+                        <td><h5>{{item['quantity']}}</h5></td>
                         <td><h5>${{item['price']}}</h5></td>
                         <td><h5></h5></td>
                         <td><h5>${{item['price']*item['quantity']|round(2)}}</h5></td>
