@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Utilisateur</title>
+    <style>
+        /* Général */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: #004b6b;
+            margin: 20px 0;
+            font-size: 36px;
+            font-weight: bold;
+        }
+
+        /* Barre de navigation */
+        header {
+            background-color: #004b6b;
+            padding: 15px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 90%;
+            margin: 0 auto;
+        }
+
+        .logo {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+        }
+
+        .nav-links li {
+            margin: 0 15px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: white;
+            font-size: 18px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            background-color: #ffcc00;
+            color: #004b6b;
+        }
+
+        /* Section Profil */
+        .profile-section {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .profile-card {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .profile-info {
+            background-color: #fff;
+            width: 30%;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .profile-info:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .profile-info h2 {
+            color: #004b6b;
+            margin-bottom: 15px;
+        }
+
+        .profile-info p {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .profile-info {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Barre de navigation -->
+    <header>
+        <nav>
+            <div class="logo">Entreprise</div>
+            <ul class="nav-links">
+                <li><a href="index.html">Retour à l'accueil</a></li>
+                <li><a href="route-optimal.html">Route Optimale</a></li>
+                <li><a href="gestion-stock.html">Gestion des Stocks</a></li>
+                <li><a href="suivi-commandes.html">Suivi des Commandes</a></li>
+                <li><a href="analyse-ventes.html">Analyse des Ventes</a></li>
+                <li><a href="alertes.html">Alertes Automatiques</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Section principale -->
+    <main>
+        <section class="profile-section">
+            <h1>Profil de l'Utilisateur</h1>
+            <div class="profile-card">
+                <div class="profile-info">
+                    <h2>Informations Personnelles</h2>
+                    <p><strong>Nom :</strong> Dupont</p>
+                    <p><strong>Prénom :</strong> Jean</p>
+                    <p><strong>Date de Naissance :</strong> 15 Avril 1985</p>
+                    <p><strong>Email :</strong> jean.dupont@email.com</p>
+                    <p><strong>Numéro de Téléphone :</strong> +33 6 12 34 56 78</p>
+                </div>
+                <div class="profile-info">
+                    <h2>Informations Professionnelles</h2>
+                    <p><strong>Poste :</strong> Responsable des Ventes</p>
+                    <p><strong>Entreprise :</strong> XYZ Corp</p>
+                    <p><strong>Département :</strong> Commerce</p>
+                    <p><strong>Adresse Bureau :</strong> 45, Avenue des Champs, Casablanca</p>
+                </div>
+                <div class="profile-info">
+                    <h2>Statistiques</h2>
+                    <p><strong>Années d'Expérience :</strong> 10 ans</p>
+                    <p><strong>Projets Réalisés :</strong> 25</p>
+                    <p><strong>Clients Gérés :</strong> 150</p>
+                    <p><strong>Récompenses :</strong> Employé du mois (5 fois)</p>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
