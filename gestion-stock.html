@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Stocks</title>
+    <style>
+        /* Styles généraux */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f3f4f6;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #003366; /* Bleu foncé */
+            color: white;
+            padding: 15px 20px;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+        }
+
+        .nav-links li {
+            margin-left: 20px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+        }
+
+        .container {
+            margin: 20px auto;
+            max-width: 1200px;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .table-container {
+            padding: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #003366; /* Bleu foncé */
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 15px;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+            background-color: #003366;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .btn.danger {
+            background-color: #f44336;
+        }
+
+        .btn.primary {
+            background-color: #1E90FF;
+        }
+
+        .add-product-container, .download-btn-container {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .add-product-container input {
+            padding: 10px;
+            margin-right: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Barre de navigation -->
+    <header>
+        <nav>
+            <div class="logo">Entreprise</div>
+            <ul class="nav-links">
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="route-optimal.html">Route Optimale</a></li>
+                <li><a href="gestion-stock.html">Gestion des Stocks</a></li>
+                <li><a href="suivi-commandes.html">Commandes</a></li>
+                <li><a href="analyse-ventes.html">Analyse</a></li>
+                <li><a href="alertes.html">Alertes</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Section principale -->
+    <main>
+        <div class="container">
+            <!-- Tableau des produits -->
+            <div class="table-container">
+                <table id="stockTable">
+                    <thead>
+                        <tr>
+                            <th>Produit</th>
+                            <th>Quantité</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Ordinateurs</td><td>10</td><td><button class="btn primary" onclick="orderProduct(this, 'Ordinateurs')">Commander</button> <button class="btn danger" onclick="deleteProduct(this)">Supprimer</button></td></tr>
+                        <tr><td>Imprimantes</td><td>5</td><td><button class="btn primary" onclick="orderProduct(this, 'Imprimantes')">Commander</button> <button class="btn danger" onclick="deleteProduct(this)">Supprimer</button></td></tr>
+                        <tr><td>Souris</td><td>20</td><td><button class="btn primary" onclick="orderProduct(this, 'Souris')">Commander</button> <button class="btn danger" onclick="deleteProduct(this)">Supprimer</button></td></tr>
+                        <tr><td>Claviers</td><td>15</td><td><button class="btn primary" onclick="orderProduct(this, 'Claviers')">Commander</button> <button class="btn danger" onclick="deleteProduct(this)">Supprimer</button></td></tr>
+                        <tr><td>Écrans</td><td>8</td><td><button class="btn primary" onclick="orderProduct(this, 'Écrans')">Commander</button> <button class="btn danger" onclick="deleteProduct(this)">Supprimer</button></td></tr>
+                        <tr><td>Casques</td><td>12</td><td><button class="btn primary" onclick="orderProduct(this, 'Casques')">Commander</button> <button class="btn danger" onclick="deleteProduct(this)">Supprimer</button></td></tr>
+                        <tr><td>Webcams</td><td>18</td><td><button class="btn primary" onclick="orderProduct(this, 'Webcams')">Commander</button> <button class="btn danger" onclick="deleteProduct(this)">Supprimer</button></td></tr>
+                        <tr><td>Routeurs</td><td>9</td><td><button class="btn primary" onclick="orderProduct(this, 'Routeurs')">Commander</button> <button class="btn danger" onclick="deleteProduct(this)">Supprimer</button></td></tr>
+                        <tr><td>Clés USB</td><td>25</td><td><button class="btn primary" onclick="orderProduct(this, 'Clés USB')">Commander</button> <button class="btn danger" onclick="deleteProduct(this)">Supprimer</button></td></tr>
+                        <tr><td>Disques Durs</td><td>7</td><td><button class="btn primary" onclick="orderProduct(this, 'Disques Durs')">Commander</button> <button class="btn danger" onclick="deleteProduct(this)">Supprimer</button></td></tr>
+                        <tr><td>Switchs Réseau</td><td>3</td><td><button class="btn primary" onclick="orderProduct(this, 'Switchs Réseau')">Commander</button> <button class="btn danger" onclick="deleteProduct(this)">Supprimer</button></td></tr>
+                        <tr><td>Câbles HDMI</td><td>14</td><td><button class="btn primary" onclick="orderProduct(this, 'Câbles HDMI')">Commander</button> <button class="btn danger" onclick="deleteProduct(this)">Supprimer</button></td></tr>
+                        <tr><td>Onduleurs</td><td>6</td><td><button class="btn primary" onclick="orderProduct(this, 'Onduleurs')">Commander</button> <button class="btn danger" onclick="deleteProduct(this)">Supprimer</button></td></tr>
+                        <tr><td>Cartes Graphiques</td><td>4</td><td><button class="btn primary" onclick="orderProduct(this, 'Cartes Graphiques')">Commander</button> <button class="btn danger" onclick="deleteProduct(this)">Supprimer</button></td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Ajouter un produit -->
+            <div class="add-product-container">
+                <div>
+                    <input type="text" id="newProductName" placeholder="Nom du produit">
+                    <input type="number" id="newProductQuantity" placeholder="Quantité initiale">
+                    <button class="btn primary" onclick="addProduct()">Ajouter un produit</button>
+                </div>
+            </div>
+
+            <!-- Télécharger le bilan -->
+            <div class="download-btn-container">
+                <button class="btn primary" onclick="downloadStock()">Télécharger le bilan</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Fonction pour commander un produit (ajouter à la quantité)
+        function orderProduct(button, productName) {
+            const quantity = prompt(`Combien de ${productName} voulez-vous commander ?`);
+            if (quantity && !isNaN(quantity) && parseInt(quantity) > 0) {
+                alert(`${quantity} ${productName}(s) commandé(s) avec succès.`);
+                const row = button.closest('tr');
+                const quantityCell = row.querySelector('td:nth-child(2)');
+                quantityCell.textContent = parseInt(quantityCell.textContent) + parseInt(quantity); // Ajoute la quantité commandée
+            } else {
+                alert('Quantité non valide.');
+            }
+        }
+
+        // Fonction pour ajouter un produit
+        function addProduct() {
+            const productName = document.getElementById('newProductName').value;
+            const productQuantity = document.getElementById('newProductQuantity').value;
+
+            if (productName && productQuantity && !isNaN(productQuantity) && parseInt(productQuantity) > 0) {
+                const table = document.querySelector('#stockTable tbody');
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${productName}</td><td>${productQuantity}</td><td><button class="btn primary" onclick="orderProduct(this, '${productName}')">Commander</button> <button class="btn danger" onclick="deleteProduct(this)">Supprimer</button></td>`;
+                table.appendChild(row);
+            } else {
+                alert('Nom ou quantité invalide.');
+            }
+        }
+
+        // Fonction pour supprimer un produit
+        function deleteProduct(button) {
+            const row = button.closest('tr');
+            row.remove();
+        }
+
+        // Fonction pour télécharger le bilan des stocks en CSV
+        function downloadStock() {
+            const table = document.getElementById('stockTable');
+            let csvContent = "Produit,Quantité\n";
+
+            for (let row of table.rows) {
+                const cells = row.querySelectorAll('td');
+                if (cells.length > 0) {
+                    const product = cells[0].textContent;
+                    const quantity = cells[1].textContent;
+                    csvContent += `${product},${quantity}\n`;
+                }
+            }
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'bilan_stocks.csv';
+            link.click();
+        }
+    </script>
+</body>
+</html>
