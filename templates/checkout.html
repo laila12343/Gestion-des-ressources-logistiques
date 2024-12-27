@@ -84,7 +84,7 @@
                   <div class="col-12">
                       <div class="d-grid gap-2">
                          
-                        <button class="btn btn-primary" type="button" id="cbtn" onclick="confirmPayment()" >Continue</button>
+                        <button class="btn btn-primary" type="button" id="cbtn" onclick="confirmPayment()">Continue</button>
 
 
                           <!-- <button class="btn btn-primary hidden" type="button" id = 'pbtn'>Paypal</button> -->
@@ -213,57 +213,64 @@
   }
   
   function confirmPayment() {
-    console.log("confirmPayment appelée"); // Vérifier si la fonction est appelée
+    console.log("confirmPayment appelée");
 
-    // Collect user data
-    const user_data = {
-        nom: document.getElementById('last_name').value,
-        prenom: document.getElementById('first_name').value,
-        email: document.getElementById('email').value,
-        telephone: document.getElementById('phone').value,
-        adresse_livraison: document.getElementById('delivery_address').value,
-        articles: [],
-        total: parseFloat(total).toFixed(2), // Make sure 'total' is declared earlier in your script
-    };
-
-    // Populate the `articles` array with cart items
-    const rows = document.querySelectorAll('#cartitems tr'); // Make sure the cart table has the ID 'cartitems'
-    rows.forEach(row => {
-        const item = {
-            nom: row.querySelector('h5:nth-child(1)').innerText,
-            quantite: row.querySelector('.quantity').value,
-            prix: row.querySelector('h5:nth-child(3)').innerText,
-            total: row.querySelector('h5:nth-child(5)').innerText
+    try {
+        const user_data = {
+            nom: document.getElementById('last_name').value,
+            prenom: document.getElementById('first_name').value,
+            email: document.getElementById('email').value,
+            telephone: document.getElementById('phone').value,
+            adresse_livraison: document.getElementById('delivery_address').value,
+            articles: [],
+            total: parseFloat(total).toFixed(2),
         };
-        user_data.articles.push(item);
-    });
 
-    console.log("Données utilisateur préparées :", user_data);
+        console.log("User data collected:", user_data);
 
-    // Send data to the server
-    fetch('/save_data', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': csrftoken // Ensure 'csrftoken' is declared in your HTML or script
-        },
-        body: JSON.stringify(user_data)
-    })
-        .then(response => response.json())
-        .then(data => {
-            console.log("Réponse du serveur :", data);
-            if (data.message) {
-                // Redirect to the confirmation page with all necessary parameters
-                const confirmationUrl = `/confirmation?nom=${encodeURIComponent(user_data.nom)}&prenom=${encodeURIComponent(user_data.prenom)}&adresse_livraison=${encodeURIComponent(user_data.adresse_livraison)}&total=${user_data.total}&articles=${encodeURIComponent(JSON.stringify(user_data.articles))}`;
-                window.location.href = confirmationUrl;
-            } else {
-                alert("Erreur : " + data.error);
-            }
-        })
-        .catch(error => {
-            console.error("Erreur lors de l'envoi des données :", error);
+        const rows = document.querySelectorAll('#cartitems tr');
+        rows.forEach(row => {
+            const item = {
+                nom: row.querySelector('h5:nth-child(1)').innerText,
+                quantite: row.querySelector('.quantity').value,
+                prix: row.querySelector('h5:nth-child(3)').innerText,
+                total: row.querySelector('h5:nth-child(5)').innerText
+            };
+            user_data.articles.push(item);
         });
+
+        console.log("Articles added:", user_data.articles);
+
+        fetch('/save_data', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify(user_data)
+        })
+            .then(response => {
+                console.log("Response received:", response);
+                return response.json();
+            })
+            .then(data => {
+                console.log("Server response data:", data);
+                if (data.message) {
+                    const confirmationUrl = `/confirmation?nom=${encodeURIComponent(user_data.nom)}&prenom=${encodeURIComponent(user_data.prenom)}&adresse_livraison=${encodeURIComponent(user_data.adresse_livraison)}&total=${user_data.total}&articles=${encodeURIComponent(JSON.stringify(user_data.articles))}`;
+                    console.log("Redirecting to:", confirmationUrl);
+                    window.location.href = confirmationUrl;
+                } else {
+                    alert("Erreur : " + data.error);
+                }
+            })
+            .catch(error => {
+                console.error("Fetch error:", error);
+            });
+    } catch (error) {
+        console.error("Error in confirmPayment:", error);
+    }
 }
+
 
 
 
