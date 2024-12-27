@@ -3,6 +3,7 @@ from flask_wtf.csrf import CSRFProtect
 import os
 import json
 import random
+import pandas as pd
 app = Flask(__name__)
 app.secret_key = 'sakhta-secret-key'
 csrf = CSRFProtect(app)
@@ -16,38 +17,54 @@ products = [
 ]
 orders = {"user1": [{"id": 1, "status": "Delivered"}, {"id": 2, "status": "In preparation"}]}
 feedbacks = []
+
+#data=pd.read_csv('DataBase.xlsx')
+import os
+import random
+import json
+import pandas as pd
+
+# File paths
 data_file = "shop_items.json"
+excel_file = "DataBase.xlsx"
+
+# Check if the data file exists
 if os.path.exists(data_file):
-    # Load the dictionary from the file
+    # Load the dictionary from the JSON file
     with open(data_file, "r") as file:
         shop_items = json.load(file)
-else:        
+else:
+    # Read the Excel file
     shop_items = {}
-    img_folder = os.path.join(app.static_folder, "img")
-    for i, filename in enumerate(os.listdir(img_folder), start=1):
-            if filename.endswith((".png", ".jpg", ".jpeg")):
-                # Generate random data for each item
-                item_id = random.randint(1000, 9999)  # Random 4-digit ID
-                prod_name = f"Product {i}"  # Example product name
-                prod_detail = f"Details about Product {i}"  # Example product details
-                prod_price = round(random.uniform(10, 100), 2)  # Random price between $10 and $100
-                prod_stock = random.randint(0, 50)  # Random stock quantity
-                prod_available = (prod_stock>0)  # Random boolean
-                img_url = f"img/{filename}"  # Image path relative to the static folder
+    df = pd.read_excel(excel_file)
 
-                # Add the item to the dictionary
-                shop_items[item_id] = {
-                    #"id": item_id,
-                    "name": prod_name,
-                    "detail": prod_detail,
-                    "price": prod_price,
-                    "stock": prod_stock,
-                    "is_available": prod_available,
-                    "img": img_url,
-                }
+    # Iterate through the rows of the Excel file
+    for _, row in df.iterrows():
+        item_id = row['ID']  # Random 4-digit ID
+        prod_name = row['Short_Name']  # Replace with the actual column name
+        prod_detail = row['Details']  # Replace with the actual column name
+        prod_price = round(row['actual_price'], 2)  # Replace with the actual column name
+        prod_stock = random.randint(0, 50)  # Replace with the actual column name
+        prod_available = prod_stock > 0  # Determine availability
+        img_url = row['Image']  # Replace with the actual column name
+
+        # Add the item to the dictionary
+        shop_items[item_id] = {
+            "name": prod_name,
+            "detail": prod_detail,
+            "price": prod_price,
+            "stock": prod_stock,
+            "is_available": prod_available,
+            "img": img_url,
+        }
+
+    # Save the dictionary to a JSON file
     with open(data_file, "w") as file:
-        json.dump(shop_items, file)            
-desired_names = ["Product 6", "Product 9", "Product 10"]
+        json.dump(shop_items, file)
+
+# Generate a cart dictionary based on desired product names
+desired_names = ["GUESS Gradient Butterfly", "boAt Airdopes 141", "Oppo Enco M32"]
+
 cart = {
     key: {**value, "quantity": random.randint(1, 4)}
     for key, value in shop_items.items()
@@ -55,38 +72,22 @@ cart = {
 }
 
 
-old_cart = {
-    "8467": {  # Product ID as the key (string)
-       # "id": 1,          # Product ID
-        "name": "Product 9", # Product name
-        "price": 1000.0,  # Price per unit
-        "quantity": 2, # Quantity of the product
-        "image": "laptop.jpg"
-    },
-    "9493": {  # Another product in the cart
-        #"id": 2,
-        "name": "Mouse",
-        "price": 50.0,
-        "quantity": 1,
-        "image": "mouse.jpg"
-    },
-    "2921": {
-       # "id": 3,
-        "name": "Camera",
-        "price": 750.0,
-        "quantity": 1,
-        "image": "camera.jpg"
-    },
+=======
 }
 
 @app.context_processor
 def inject_csrf_token():
     from flask_wtf.csrf import generate_csrf
     return dict(csrf_token=generate_csrf())
-            
 #shop_items = {item for filename in os.listdir(img_folder) if filename.endswith((".png", ".jpg", ".jpeg"))]
 #print(sum(item['price'] * item['quantity'] for item in cart.values()))
 # ---------------- User Authentication ----------------
+
+@app.context_processor
+def inject_csrf_token():
+    from flask_wtf.csrf import generate_csrf
+    return dict(csrf_token=generate_csrf())
+
 @app.route('/account')
 def account():
     customer = {
@@ -162,7 +163,7 @@ def update_cart_item(product_id, quantity):
 
 
 
-@app.route('/add_to_cart/<int:product_id>', methods=['POST'])
+@app.route('/add_to_cart/<product_id>', methods=['POST'])
 def add_to_cart(product_id):
     #session.setdefault('cart', {})
     #cart={"num_of_items": 5}
@@ -181,6 +182,7 @@ def add_to_cart(product_id):
     # Redirect back to the page the user was on
     return render_template('gallery.html', shop_items=shop_items)
     #return redirect(url_for('cart'))
+
 
 
 @app.route('/delete_from_cart/<int:product_id>')
