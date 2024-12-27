@@ -1,3 +1,4 @@
+from flask import request, jsonify
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session
 from flask_wtf.csrf import CSRFProtect
 import os
@@ -252,6 +253,7 @@ def chat():
 
 
 # ---------------- Notifications ----------------
+
 @app.route('/notifications')
 def notifications():
     # Mock notifications for order updates
@@ -265,3 +267,48 @@ def notifications():
 # ---------------- Run the App ----------------
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+
+@app.route('/save_data', methods=['POST'])
+def save_data():
+    data = request.get_json()
+    print("Données reçues :", data)  # Log pour débogage
+    user_data = {
+        "nom": data.get('nom'),
+        "prenom": data.get('prenom'),
+        "email": data.get('email'),
+        "telephone": data.get('telephone'),
+        "adresse_livraison": data.get('adresse_livraison'),
+        "articles_commandes": data.get('articles'),
+        "total": data.get('total')
+    }
+
+    try:
+        with open('commande.json', 'w') as json_file:
+            json.dump(user_data, json_file, indent=4)
+        return jsonify({"message": "Données enregistrées avec succès"}), 200
+    except Exception as e:
+        print("Erreur lors de l'enregistrement :", str(e))
+        return jsonify({"error": str(e)}), 500
+
+
+from flask import render_template, request
+
+@app.route('/confirmation', methods=['GET'])
+def confirmation():
+    # Récupérer les données passées via les paramètres de l'URL
+    nom = request.args.get('nom')
+    prenom = request.args.get('prenom')
+    adresse = request.args.get('adresse_livraison')
+    total = request.args.get('total')
+    articles = json.loads(request.args.get('articles'))  # Décoder les articles JSON
+
+    return render_template(
+        'confirmation.html',
+        nom=nom,
+        prenom=prenom,
+        adresse=adresse,
+        total=total,
+        articles=articles
+    )

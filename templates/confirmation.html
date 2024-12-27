@@ -1,0 +1,70 @@
+{% extends 'index.html' %}
+{% block content %}
+
+    <style>
+        .container {
+            width: 70%;
+            margin: 0 auto;
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+        h1, h2, h3 {
+            text-align: center;
+        }
+        .left, .right {
+            display: inline-block;
+            vertical-align: top;
+        }
+        .left {
+            width: 70%;
+        }
+        .right {
+            width: 25%;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid hsl(117, 68%, 39%);
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: hsl(298, 57%, 39%);
+        }
+    </style>
+
+    <div class="container">
+        <h1>Confirmation de la commande</h1>
+        <p>Merci pour votre commande, {{ prenom }} {{ nom }} !</p>
+        <p><strong>Adresse de livraison :</strong> {{ adresse }}</p>
+    
+        <h3>Détails de la commande :</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Article</th>
+                    <th>Quantité</th>
+                    <th>Prix</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in articles %}
+                <tr>
+                    <td>{{ item.nom }}</td>
+                    <td>{{ item.quantite }}</td>
+                    <td>{{ item.prix }}</td>
+                    <td>{{ item.total }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    
+        <h3>Total : {{ total }} USD</h3>
+    </div>
+    
+{%endblock%}
