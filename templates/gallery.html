@@ -1,0 +1,136 @@
+{% extends 'index.html' %}
+{% block content %}
+<style>
+    .gallery-item {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .gallery-item:hover {
+        transform: scale(1.05);
+    }
+
+    .gallery-item img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .add-to-cart {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: none;
+        z-index: 10;
+    }
+
+    .gallery-item:hover .add-to-cart {
+        display: block;
+    }
+
+    .item-title {
+        text-align: center;
+        padding: 10px;
+        font-weight: bold;
+    }
+
+    .details {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease-in-out;
+    }
+
+    .details.active {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .details h3 {
+        margin: 0;
+        padding: 10px;
+    }
+
+    .details p {
+        margin: 10px 0;
+    }
+
+    .back-arrow {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: #fff;
+        color: #333;
+        border: none;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        font-size: 20px;
+    }
+
+    .back-arrow:hover {
+        background: #f0f0f0;
+    }
+</style>
+</head>
+<body>
+<div class="container my-5">
+    <h2 class="text-center mb-4">Gallery</h2>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+        {% for key, item in shop_items.items() %}
+        <div class="col">
+            <div class="gallery-item" onclick="showDetails(this)">
+                <img src="{{ url_for('static', filename=item['img']) }}" alt="{{ key }}">
+                <div class="item-title">{{item['name']}} </div>
+                <div class="item-price">${{ item['price'] }}</div>
+                <div class="item-availability">{{ 'available' if item['is_available']==True else 'not available' }}</div>
+                <form action="{{ url_for('add_to_cart', product_id=key) }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <button class="btn btn-primary add-to-cart" >Add to Cart</button>
+                </form>
+                <div class="details">
+                    <button class="back-arrow" onclick="hideDetails(event, this)">←</button>
+                    <h3>{{ item['name'] }}</h3>
+                    <p>Description: {{ item['detail'] }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    // Show details when clicking on the gallery item
+    function showDetails(element) {
+        const details = element.querySelector('.details');
+        details.classList.add('active');
+    }
+
+    // Hide details and return to the original state
+    function hideDetails(event, button) {
+        event.stopPropagation(); // Prevent triggering the parent's click event
+        const details = button.parentElement;
+        details.classList.remove('active');
+    }
+</script>
+
+{% endblock %}
