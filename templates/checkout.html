@@ -1,0 +1,242 @@
+{% extends 'index.html' %}
+{% block content %}
+<input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+<style>
+    #cart_image{
+        width: 50px;
+        height: 50px;
+    }
+    #cart_image img{
+        width: 100%;
+        height: 100%;
+    }
+</style>
+
+
+<div class = 'container'>
+    <div class = 'row'>
+
+
+       
+      <!-- Shipping-Form Section -->
+
+        <div class = 'col-md-6'>
+          <div class="uk-width-xlarge uk-margin">
+              <div class="uk-card uk-card-small uk-card-default uk-card-body">
+                {% if customer_address %}
+                {% for address in customer_address %}
+                <h4>Current Address</h4>
+                <h5>{{address.home_address}} {{address.bus_stop}}, {{address.city}}, {{address.state}}</h5>
+                <a href = " {{ url_for('changeaddress') }} "><button class="btn btn-info">Change Address</button></a>
+               
+                {% endfor %}
+                {% else %}
+                <form class="row g-3" id='shipping-form' method='POST'>
+                  <form class="row g-3" id ='shipping-form' method = 'POST'>
+                    
+                    <div id='shippingInfo'>
+                      <h3>Shipping Information</h3>
+                      <br>
+                      <div class='row'>
+                          <!-- Nom -->
+                          <div class="col-md-6">
+                              <label for="last_name" class="form-label">Nom</label>
+                              <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Entrez votre nom" required>
+                          </div>
+                  
+                          <!-- Prénom -->
+                          <div class="col-md-6">
+                              <label for="first_name" class="form-label">Prénom</label>
+                              <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Entrez votre prénom" required>
+                          </div>
+                  
+                          <!-- Adresse e-mail -->
+                          <div class="col-md-6">
+                              <label for="email" class="form-label">Adresse e-mail</label>
+                              <input type="email" class="form-control" id="email" name="email" placeholder="Entrez votre e-mail" required>
+                          </div>
+                  
+                          <!-- Numéro de téléphone -->
+                          <div class="col-md-6">
+                              <label for="phone" class="form-label">Numéro de téléphone</label>
+                              <input type="tel" class="form-control" id="phone" name="phone" placeholder="Entrez votre numéro de téléphone" required>
+                          </div>
+                  
+                          <!-- Mode de livraison -->
+                          <div class="col-md-6">
+                              <label for="delivery_mode" class="form-label">Mode de livraison</label>
+                              <select class="form-control" id="delivery_mode" name="delivery_mode" required>
+                                  <option value="domicile">À domicile</option>
+                              </select>
+                          </div>
+                  
+                          <!-- Adresse de livraison -->
+                          <div class="col-md-12">
+                              <label for="delivery_address" class="form-label">Adresse de livraison</label>
+                              <textarea class="form-control" id="delivery_address" name="delivery_address" rows="3" placeholder="Entrez votre adresse de livraison complète" required></textarea>
+                          </div>
+                      </div>
+                  </div>
+                  
+              
+                
+                  <div class="col-12">
+                      <div class="d-grid gap-2">
+                          <button class="btn btn-primary" type="submit" id = 'cbtn' >Continue</button>
+                          <!-- <button class="btn btn-primary hidden" type="button" id = 'pbtn'>Paypal</button> -->
+                        </div>
+                  </div>
+                
+                  
+                  <div class="col-12">
+                    <div class="d-grid gap-2">
+                         <div id = 'pbtn' class = 'hidden'>
+                          
+                         </div>
+    
+
+    <!-- Include the PayPal JavaScript SDK -->
+    
+
+    
+                      </div>
+                </div>
+
+                </form>
+{% endif %}
+                
+              </div>
+          </div>
+      </div>
+
+
+
+      <!-- Cart Section -->
+
+
+        <div class = 'col-md-6'>
+            <div class="uk-width-xlarge uk-margin">
+                <div class="uk-card uk-card-small uk-card-default uk-card-body"><table class="table">
+                    <thead>
+                      <tr>
+                        
+                        <h2>Order Summary</h2>
+                        <h3><strong>Total: ${{total|default(0)|round(2)}}</strong><h3></h3>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        
+                        <th scope="col"><h5>Item</h5></th>
+                        <th scope="col"><h5></h5></th>
+                        <th scope="col"><h5>Quantity</h5></th>
+                        <th scope="col"><h5>Price</h5></th>
+                        <th scope="col"><h5></h5></th>
+                        <th scope="col"><h5>Total</h5></th>
+                      </tr>
+                      {% for id,item in cart.items() %}
+                      <tr>
+                        
+
+                        <td scope="row"><div id = "cart_image"><img src = '{{ url_for('static', filename=item['img']) }}' alt="{{ key }}"></div></td>
+                        <td scope="row"><div id = "cart_image"><img src = '{{ url_for('static', filename=item['img']) }}' alt="{{key}}"></div></td>
+
+                        <td><h5>{{item['name']}}</h5></td>
+                        <td><h5>{{item['quantity']}}</h5></td>
+                        <td><h5>${{item['price']}}</h5></td>
+                        <td><h5></h5></td>
+                        <td><h5>${{item['price']*item['quantity']|round(2)}}</h5></td>
+                      </tr>
+                     {% endfor %}
+                     
+                     
+                     
+                     
+
+                    </tbody>
+                  </table>
+                  <div id="paypal-button-container"></div>
+                  
+                </div></div>
+
+            
+        </div>
+
+    </div>
+</div>
+
+<!-- Include the PayPal JavaScript SDK -->
+<script src="https://www.paypal.com/sdk/js?client-id=AWdyi0gdJ8bnRrMNcPi3vOymPFwT2in6tLbMajvbiq66gjItaMqL9wDw-2vyn72lIwBkkVBfOxihdi_k&currency=USD"></script>
+
+<script>
+  var total = "{{cart.cart_total}}"
+  
+    // Render the PayPal button into #paypal-button-container
+    paypal.Buttons({
+        // Set up the transaction
+        createOrder: function(data, actions) {
+          
+            return actions.order.create({
+                purchase_units: [{
+                    amount: {
+                        value: parseFloat(total).toFixed(2)
+                    }
+                }]
+            });
+        },
+
+        // Finalize the transaction
+        onApprove: function(data, actions) {
+            return actions.order.capture().then(function(orderData) {
+                // Successful capture! For demo purposes:
+                console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
+                var transaction = orderData.purchase_units[0].payments.captures[0];
+                confirmPayment()
+               
+                // Replace the above to show a success message within this page, e.g.
+                // const element = document.getElementById('paypal-button-container');
+                // element.innerHTML = '';
+                // element.innerHTML = '<h3>Thank you for your payment!</h3>';
+                // Or go to another URL:  actions.redirect('thank_you.html');
+            });
+        }
+
+
+    }).render('#paypal-button-container');
+</script>
+
+<script>
+  let inputs = document.getElementsByTagName('input')
+  for(let i = 0; i<inputs.length; i++){
+    inputs[i].classList.add('form-control')
+  }
+  
+  function confirmPayment(){
+    const data = { total: total };
+    console.log(data.total)
+    let url = "/payment"
+
+fetch(url, {
+  method: 'POST', // or 'PUT'
+  headers: {
+    'Content-Type': 'application/json',
+    'X-CSRFToken': csrftoken
+  },
+  body: JSON.stringify(data),
+})
+.then(response => response.json())
+.then(data => {
+  console.log('Success:', data);
+  alert('Transaction completed')
+    window.location.href=" {{ url_for('index') }} "
+})
+.catch((error) => {
+  console.error('Error:', error);
+  alert('There is an issue with your purchase')
+});
+
+  }
+  
+</script>
+
+{% endblock %}
