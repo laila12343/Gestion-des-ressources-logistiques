@@ -1,5 +1,6 @@
 {% extends 'index.html' %}
 {% block content %}
+
 <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
 <style>
     #cart_image{
@@ -82,7 +83,10 @@
                 
                   <div class="col-12">
                       <div class="d-grid gap-2">
-                          <button class="btn btn-primary" type="submit" id = 'cbtn' >Continue</button>
+                         
+                        <button class="btn btn-primary" type="button" id="cbtn" onclick="confirmPayment(this)">Continue</button>
+
+
                           <!-- <button class="btn btn-primary hidden" type="button" id = 'pbtn'>Paypal</button> -->
                         </div>
                   </div>
@@ -137,9 +141,7 @@
                       {% for id,item in cart.items() %}
                       <tr>
                         
-
-                        <td scope="row"><div id = "cart_image"><img src = '{{ url_for('static', filename=item['img']) }}' alt="{{ key }}"></div></td>
-
+                        <td scope="row"><div id = "cart_image"><img src = '{{ url_for('static', filename=item['img']) }}' alt="{{key}}"></div></td>
                         <td><h5>{{item['name']}}</h5></td>
                         <td><h5>{{item['quantity']}}</h5></td>
                         <td><h5>${{item['price']}}</h5></td>
@@ -210,31 +212,70 @@
     inputs[i].classList.add('form-control')
   }
   
-  function confirmPayment(){
-    const data = { total: total };
-    console.log(data.total)
-    let url = "/payment"
+  function confirmPayment() {
+    console.log("confirmPayment appelée");
 
-fetch(url, {
-  method: 'POST', // or 'PUT'
-  headers: {
-    'Content-Type': 'application/json',
-    'X-CSRFToken': csrftoken
-  },
-  body: JSON.stringify(data),
-})
-.then(response => response.json())
-.then(data => {
-  console.log('Success:', data);
-  alert('Transaction completed')
-    window.location.href=" {{ url_for('index') }} "
-})
-.catch((error) => {
-  console.error('Error:', error);
-  alert('There is an issue with your purchase')
-});
+    try {
+        const user_data = {
+            nom: document.getElementById('last_name').value,
+            prenom: document.getElementById('first_name').value,
+            email: document.getElementById('email').value,
+            telephone: document.getElementById('phone').value,
+            adresse_livraison: document.getElementById('delivery_address').value,
+            articles: [],
+            total: parseFloat(total).toFixed(2),
+        };
 
-  }
+        console.log("User data collected:", user_data);
+
+        const rows = document.querySelectorAll('#cartitems tr');
+        rows.forEach(row => {
+            const item = {
+                nom: row.querySelector('h5:nth-child(1)').innerText,
+                quantite: row.querySelector('.quantity').value,
+                prix: row.querySelector('h5:nth-child(3)').innerText,
+                total: row.querySelector('h5:nth-child(5)').innerText
+            };
+            user_data.articles.push(item);
+        });
+
+        console.log("Articles added:", user_data.articles);
+
+        fetch('/save_data', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify(user_data)
+        })
+            .then(response => {
+                console.log("Response received:", response);
+                return response.json();
+            })
+            .then(data => {
+                console.log("Server response data:", data);
+                if (data.message) {
+                    const confirmationUrl = `/confirmation?nom=${encodeURIComponent(user_data.nom)}&prenom=${encodeURIComponent(user_data.prenom)}&adresse_livraison=${encodeURIComponent(user_data.adresse_livraison)}&total=${user_data.total}&articles=${encodeURIComponent(JSON.stringify(user_data.articles))}`;
+                    console.log("Redirecting to:", confirmationUrl);
+                    window.location.href = confirmationUrl;
+                } else {
+                    alert("Erreur : " + data.error);
+                }
+            })
+            .catch(error => {
+                console.error("Fetch error:", error);
+            });
+    } catch (error) {
+        console.error("Error in confirmPayment:", error);
+    }
+}
+
+
+
+
+
+
   
 </script>
 
