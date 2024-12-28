@@ -9,21 +9,8 @@ app.secret_key = 'sakhta-secret-key'
 csrf = CSRFProtect(app)
 # Mock Databases
 users = {"user1": {"name": "John", "email": "john@example.com", "password": "1234"}}
-
-products = [
-    {"id": 1, "name": "Product A", "price": 100},
-    {"id": 2, "name": "Product B", "price": 200},
-    {"id": 3, "name": "Product C", "price": 300},
-]
 orders = {"user1": [{"id": 1, "status": "Delivered"}, {"id": 2, "status": "In preparation"}]}
 feedbacks = []
-
-#data=pd.read_csv('DataBase.xlsx')
-import os
-import random
-import json
-import pandas as pd
-
 # File paths
 data_file = "shop_items.json"
 excel_file = "DataBase.xlsx"
@@ -46,7 +33,8 @@ else:
         prod_price = round(row['actual_price'], 2)  # Replace with the actual column name
         prod_stock = random.randint(0, 50)  # Replace with the actual column name
         prod_available = prod_stock > 0  # Determine availability
-        img_url = row['Image']  # Replace with the actual column name
+        link=row['Image'].replace("https://m.media-amazon.com/images/I/", "")
+        img_url = f"img/{link}"  # Replace with the actual column name
 
         # Add the item to the dictionary
         shop_items[item_id] = {
@@ -71,10 +59,6 @@ cart = {
     if value["name"] in desired_names
 }
 
-
-=======
-}
-
 @app.context_processor
 def inject_csrf_token():
     from flask_wtf.csrf import generate_csrf
@@ -82,11 +66,6 @@ def inject_csrf_token():
 #shop_items = {item for filename in os.listdir(img_folder) if filename.endswith((".png", ".jpg", ".jpeg"))]
 #print(sum(item['price'] * item['quantity'] for item in cart.values()))
 # ---------------- User Authentication ----------------
-
-@app.context_processor
-def inject_csrf_token():
-    from flask_wtf.csrf import generate_csrf
-    return dict(csrf_token=generate_csrf())
 
 @app.route('/account')
 def account():
@@ -104,15 +83,14 @@ def account():
 
 @app.route('/')
 def index():
-    
-    num_of_items = len(cart)
-    return render_template('index.html', user_authenticated=True, user_name="John", cart=cart, products=products)
+    #num_of_items = len(cart)
+    return render_template('index.html', user_authenticated=True, user_name="John", cart=cart)
 
 @app.route('/shop')
 def show_gallery():
     #img_folder = os.path.join(app.static_folder, "img")
     images = [shop_items[item]['img'] for item in shop_items]
-    return render_template('gallery.html', products=products,images=images, shop_items=shop_items)
+    return render_template('gallery.html',images=images, shop_items=shop_items)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -149,10 +127,9 @@ def profile():
 # ---------------- Shopping Cart ----------------
 @app.route('/cart')
 def shop_cart():
-    
     #cart = session.get('cart', {})
     total = sum(item['price'] * item['quantity'] for item in cart.values())
-    return render_template('cart.html', cart=cart, products=products, total=total)
+    return render_template('cart.html', cart=cart, total=total)
 
 def update_cart_item(product_id, quantity):
     #cart = session.get('cart', {})
@@ -168,13 +145,13 @@ def add_to_cart(product_id):
     #session.setdefault('cart', {})
     #cart={"num_of_items": 5}
     #cart = session['cart']
-    product_id = str(product_id)
+    #product_id = str(product_id)
     if product_id in shop_items:
         if product_id in cart:
             cart[product_id]['quantity'] += 1
         else:
             prod_by_id=shop_items[product_id]
-            cart[product_id] = {'name':prod_by_id['name'],'price':prod_by_id['price'] ,'quantity': 1,'image': prod_by_id['img']}
+            cart[product_id] = {'name':prod_by_id['name'],'price':prod_by_id['price'] ,'quantity': 1,'img': prod_by_id['img']}
         session['cart'] = cart
         session.modified = True
     else:
@@ -219,7 +196,7 @@ def checkout():
     context = {'cart': cart #,'form':form
                #'cartitems':cartitems, #'customer_address': customer_address
                }
-    return render_template('checkout.html', cart=cart, products=products, total=total,csrf_token=token,context=context)
+    return render_template('checkout.html', cart=cart, total=total,csrf_token=token,context=context)
 
 
 # ---------------- Order Tracking ----------------
