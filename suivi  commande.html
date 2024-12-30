@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suivi des Commandes</title>
+    <style>
+        /* Général */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: #004b6b;
+            margin: 20px 0;
+            font-size: 36px;
+            font-weight: bold;
+        }
+
+        /* Barre de navigation */
+        header {
+            background-color: #004b6b;
+            padding: 15px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 90%;
+            margin: 0 auto;
+        }
+
+        .logo {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+        }
+
+        .nav-links li {
+            margin: 0 15px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: white;
+            font-size: 18px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            background-color: #ffcc00;
+            color: #004b6b;
+        }
+
+        /* Formulaire */
+        .form-container {
+            max-width: 800px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-container h2 {
+            color: #004b6b;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            font-size: 18px;
+            color: #333;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            border-color: #004b6b;
+            outline: none;
+        }
+
+        .form-group button {
+            background-color: #004b6b;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .form-group button:hover {
+            background-color: #ffcc00;
+            color: #004b6b;
+        }
+
+        /* Résultats */
+        .results {
+            margin-top: 30px;
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .results h3 {
+            color: #004b6b;
+        }
+
+        .results p {
+            font-size: 18px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">Entreprise</div>
+            <ul class="nav-links">
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="profil.html">Profil</a></li>
+                <li><a href="gestion-stock.html">Gestion des Stocks</a></li>
+                <li><a href="suivi-commandes.html">Suivi des Commandes</a></li>
+                <li><a href="analyse-ventes.html">Analyse des Ventes</a></li>
+                <li><a href="alertes.html">Alertes</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="form-container">
+            <h2>Suivez votre commande</h2>
+            <form action="#" method="POST">
+                <div class="form-group">
+                    <label for="order-id">Numéro de commande :</label>
+                    <input type="text" id="order-id" name="order-id" placeholder="Entrez le numéro de commande" required>
+                </div>
+                <div class="form-group">
+                    <button type="submit">Suivre la commande</button>
+                </div>
+            </form>
+            <div class="results">
+                <h3>Statut de la commande :</h3>
+                <p>Aucune commande suivie pour l'instant.</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Données fictives des commandes
+        const commandes = {
+            "12345": { statut: "En cours de traitement", date: "2024-12-25", client: "Jean Dupont" },
+            "67890": { statut: "Expédiée", date: "2024-12-20", client: "Marie Curie" },
+            "11121": { statut: "Livrée", date: "2024-12-18", client: "Albert Einstein" },
+            "22234": { statut: "En attente de paiement", date: "2024-12-27", client: "Isaac Newton" },
+            "33345": { statut: "Annulée", date: "2024-12-15", client: "Galilée Galiléo" },
+            "44456": { statut: "Préparée pour expédition", date: "2024-12-23", client: "Niels Bohr" },
+            "55567": { statut: "Expédiée", date: "2024-12-24", client: "Ada Lovelace" },
+            "66678": { statut: "Livrée", date: "2024-12-19", client: "Nikola Tesla" }
+        };
+
+        // Gestionnaire de soumission du formulaire
+        document.querySelector("form").addEventListener("submit", function (e) {
+            e.preventDefault(); // Empêche le rechargement de la page
+
+            // Récupère le numéro de commande saisi
+            const orderId = document.getElementById("order-id").value.trim();
+
+            // Élément pour afficher les résultats
+            const resultsContainer = document.querySelector(".results");
+
+            // Vérifie si le numéro de commande existe
+            if (commandes[orderId]) {
+                const commande = commandes[orderId];
+                resultsContainer.innerHTML = `
+                    <h3>Statut de la commande :</h3>
+                    <p>Numéro de commande : <strong>${orderId}</strong></p>
+                    <p>Statut : <strong>${commande.statut}</strong></p>
+                    <p>Date : <strong>${commande.date}</strong></p>
+                    <p>Client : <strong>${commande.client}</strong></p>
+                `;
+            } else {
+                resultsContainer.innerHTML = `
+                    <h3>Statut de la commande :</h3>
+                    <p style="color: red;">Numéro de commande introuvable. Veuillez vérifier et réessayer.</p>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>
