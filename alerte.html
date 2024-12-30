@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alertes Automatiques</title>
+    <style>
+        /* Général */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: #004b6b;
+            margin: 20px 0;
+            font-size: 36px;
+            font-weight: bold;
+        }
+
+        /* Barre de navigation */
+        header {
+            background-color: #004b6b;
+            padding: 15px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 90%;
+            margin: 0 auto;
+        }
+
+        .logo {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+        }
+
+        .nav-links li {
+            margin: 0 15px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: white;
+            font-size: 18px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            background-color: #ffcc00;
+            color: #004b6b;
+        }
+
+        /* Formulaire */
+        .form-container {
+            max-width: 800px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-container h2 {
+            color: #004b6b;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            font-size: 18px;
+            color: #333;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group button {
+            background-color: #004b6b;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .form-group button:hover {
+            background-color: #ffcc00;
+            color: #004b6b;
+        }
+
+        .alert {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+
+        .alert.stock {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">Entreprise</div>
+            <ul class="nav-links">
+                <li><a href="index.html">Retour à l'accueil</a></li>
+                <li><a href="profil.html">Profil</a></li>
+                <li><a href="gestion-stock.html">Gestion des Stocks</a></li>
+                <li><a href="suivi-commandes.html">Suivi des Commandes</a></li>
+                <li><a href="analyse-ventes.html">Analyse des Ventes</a></li>
+                <li><a href="alertes.html">Alertes Automatiques</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="form-container">
+            <h2>Configurer une alerte</h2>
+            <form id="alert-form">
+                <div class="form-group">
+                    <label for="alert-type">Type d'Alerte :</label>
+                    <select id="alert-type" name="alert-type">
+                        <option value="stock">Rupture de stock</option>
+                        <option value="order">Commande en retard</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="id">ID de la Commande :</label>
+                    <input type="text" id="id" name="id" placeholder="Entrez l'ID de la commande">
+                </div>
+                <div class="form-group">
+                    <label for="threshold">Seuil :</label>
+                    <input type="number" id="threshold" name="threshold" placeholder="Entrez le seuil">
+                </div>
+                <div class="form-group">
+                    <button type="button" onclick="checkAlert()">Enregistrer</button>
+                </div>
+            </form>
+
+            <div id="alert-message" class="alert" style="display:none;"></div>
+        </div>
+    </main>
+
+    <script>
+        // Exemple de données fictives
+        const commandes = [
+            { id: '12345', retards: 5 }, // Retard de 5 jours
+            { id: '67890', retards: 1 }, // Retard de 1 jour
+            { id: '11223', retards: 3 }  // Retard de 3 jours
+        ];
+
+        const stocks = [
+            { produit: 'Produit A', quantite: 0 },  // Rupture de stock
+            { produit: 'Produit B', quantite: 20 }, // Stock suffisant
+            { produit: 'Produit C', quantite: 5 }   // Stock faible
+        ];
+
+        function checkAlert() {
+            const alertType = document.getElementById("alert-type").value;
+            const id = document.getElementById("id").value;
+            const threshold = parseInt(document.getElementById("threshold").value);
+            const alertMessage = document.getElementById("alert-message");
+
+            // Réinitialiser l'alerte
+            alertMessage.style.display = "none";
+            alertMessage.innerHTML = "";
+
+            if (alertType === "order") {
+                // Vérification de la commande en retard
+                const commande = commandes.find(commande => commande.id === id);
+                if (commande) {
+                    if (commande.retards > threshold) {
+                        alertMessage.style.display = "block";
+                        alertMessage.innerHTML = `Alerte : La commande #${id} a un retard de ${commande.retards} jours, dépassant le seuil de ${threshold} jours.`;
+                    } else {
+                        alertMessage.style.display = "block";
+                        alertMessage.innerHTML = `La commande #${id} a un retard de ${commande.retards} jours, qui est dans le seuil.`;
+                    }
+                } else {
+                    alertMessage.style.display = "block";
+                    alertMessage.innerHTML = "ID de commande non trouvé.";
+                }
+            } else if (alertType === "stock") {
+                // Vérification du stock
+                const stock = stocks.find(stock => stock.produit === id);
+                if (stock) {
+                    if (stock.quantite === 0) {
+                        alertMessage.style.display = "block";
+                        alertMessage.classList.add("stock");
+                        alertMessage.innerHTML = `Alerte : Il y a une rupture de stock pour le ${id}.`;
+                    } else if (stock.quantite <= threshold) {
+                        alertMessage.style.display = "block";
+                        alertMessage.classList.add("stock");
+                        alertMessage.innerHTML = `Alerte : Le stock du ${id} est faible avec seulement ${stock.quantite} unités restantes.`;
+                    } else {
+                        alertMessage.style.display = "block";
+                        alertMessage.classList.add("stock");
+                        alertMessage.innerHTML = `Le stock du ${id} est suffisant avec ${stock.quantite} unités.`;
+                    }
+                } else {
+                    alertMessage.style.display = "block";
+                    alertMessage.classList.add("stock");
+                    alertMessage.innerHTML = "Produit non trouvé.";
+                }
+            }
+        }
+    </script>
+</body>
+</html>
